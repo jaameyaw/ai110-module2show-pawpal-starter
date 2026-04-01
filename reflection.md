@@ -4,8 +4,15 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The initial design centers on three core user actions:
+
+1. **Set up a pet profile** — The user enters their name, their pet's name, and the pet's species. This gives the scheduler the context it needs to understand what kind of care is appropriate (e.g., dogs need walks, cats may not).
+
+2. **Add and manage care tasks** — The user creates tasks, each with a title, estimated duration in minutes, and a priority level (low, medium, or high). These tasks form the input list the scheduler draws from when building a plan.
+
+3. **Generate and view today's schedule** — The user triggers the scheduler, which selects and orders tasks based on priority and available time, then displays the resulting plan along with a brief explanation of why each task was included and when it is scheduled.
+
+To support these actions, the design includes classes for the Owner (name, available time), the Pet (name, species), the Task (title, duration, priority), and a Scheduler that takes the task list and constraints and produces an ordered daily plan.
 
 **b. Design changes**
 
