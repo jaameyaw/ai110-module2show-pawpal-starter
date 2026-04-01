@@ -43,8 +43,11 @@ Two structural changes were made after reviewing the initial skeleton for missin
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The conflict-detection algorithm uses an exhaustive O(n²) pair comparison: every scheduled item is compared against every later item to check whether their time windows overlap. A more sophisticated approach — such as a sweep-line algorithm — would run in O(n log n) and could also group overlapping tasks into "conflict clusters" rather than listing every individual pair.
+
+The tradeoff is **simplicity and correctness over performance and output quality**. For a daily pet-care schedule, the number of tasks is typically small (fewer than 20), so the quadratic cost is invisible in practice. The explicit nested loop also makes the algorithm's intent easy to read and verify. Grouping conflicts into clusters would produce cleaner output for the owner, but it would require significantly more code and is not worth the complexity at this scale.
+
+If the app were extended to manage dozens of pets or generate weekly bulk plans, switching to a sweep-line approach and conflict clustering would become the right call.
 
 ---
 

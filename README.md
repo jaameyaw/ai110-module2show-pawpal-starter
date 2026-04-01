@@ -41,3 +41,13 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+## Smarter Scheduling
+
+The scheduler now goes beyond a simple priority list with three enhancements:
+
+**Sorting by value density** — Instead of sorting purely by priority label, tasks are ranked by *priority value ÷ duration* before being added to the plan. This greedy knapsack heuristic fits more high-value work into the owner's time budget (e.g., a short high-priority task beats a long medium-priority one).
+
+**Filtering with two-pass selection** — Required tasks are always attempted first and reserved before optional tasks compete for the remaining time. Any task that doesn't fit (or whose dependency isn't in the plan) is collected in `dropped_tasks` and surfaced in the UI so the owner knows what was skipped and why.
+
+**Conflict detection** — `DailyPlan.detect_conflicts()` scans the sorted schedule for overlapping time windows and returns every conflicting pair. `Scheduler.detect_conflicts()` wraps this into human-readable warning strings, making it easy to surface issues in the Streamlit UI or the `main.py` demo.
