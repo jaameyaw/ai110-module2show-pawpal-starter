@@ -12,12 +12,25 @@ The initial design centers on three core user actions:
 
 3. **Generate and view today's schedule** — The user triggers the scheduler, which selects and orders tasks based on priority and available time, then displays the resulting plan along with a brief explanation of why each task was included and when it is scheduled.
 
-To support these actions, the design includes classes for the Owner (name, available time), the Pet (name, species), the Task (title, duration, priority), and a Scheduler that takes the task list and constraints and produces an ordered daily plan.
+To support these actions, the design uses five classes:
+
+- **Owner** — a simple data holder storing the owner's `name` and `available_minutes` (total time per day they can spend on pet care). It has no behavior of its own; its only job is to carry the time constraint into the scheduler.
+
+- **Pet** — stores the pet's `name` and `species`. It also provides `get_default_tasks()`, which returns a species-appropriate starter list of `Task` objects so the user does not have to build a task list from scratch.
+
+- **Task** — represents a single care activity with a `title`, `duration_minutes`, and a string `priority` ("low", "medium", or "high"). The `priority_value()` method converts that string to an integer (high=3, medium=2, low=1) so tasks can be sorted numerically by the scheduler.
+
+- **Scheduler** — the coordinator. It holds an `Owner`, a `Pet`, and a list of `Task` objects. Its `generate_plan()` method sorts tasks by priority, calls `filter_tasks()` to remove anything that won't fit in the owner's available time, then assembles and returns a `DailyPlan`. Separating filtering into its own method keeps the logic readable and testable.
+
+- **DailyPlan** — the output of the scheduler. It maintains a list of scheduled items (each pairing a `Task` with a start time in minutes from midnight) and a running `total_duration`. The `add_item()` method appends to that list, `explain()` returns a human-readable summary of what was scheduled and why, and `display()` formats the data as a list of dicts for the Streamlit UI.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Two structural changes were made after reviewing the initial skeleton for missing relationships and logic gaps:
+
+1. **`DailyPlan` now receives `owner_name` and `pet_name` at construction.** In the original design, `DailyPlan` held no reference to the owner or pet, so `explain()` and `display()` could not say whose plan it was or which pet it covered. Passing those two strings in makes the plan self-contained and lets the UI display a meaningful header without reaching back into the scheduler.
+
+2. **`generate_plan()` falls back to `pet.get_default_tasks()` when the task list is empty.** In the original design, `pet` was stored on `Scheduler` but never used — it was a dead attribute. Adding the fallback puts `pet` to work and means the app produces a useful schedule even when the user hasn't manually added any tasks, which is a common first-run situation.
 
 ---
 
